@@ -20,16 +20,38 @@
           class="button--grey"
         >GitHub</a>
       </div>
+      <Card
+      v-for="(post,i ) in posts"
+      :key="i"
+      :title="post.fields.title"
+      :id="post.sys.id"
+      :date="post.sys.updatedAt"
+      />
     </div>
   </section>
 </template>
 
 <script>
 import Logo from '~/components/Logo.vue'
+import Card from '~/components/Card.vue'
+import { createClient } from '~/plugins/contentful.js'
 
+const client = createClient()
 export default {
+  transition: 'slide-left',
   components: {
-    Logo
+    Logo,
+    Card
+  },
+  asyncData({ env, params }) {
+    return client
+      .getEntries(env.CTF_BLOG_POST_TYPE_ID)
+      .then(entries => {
+        return {
+          posts: entries.items
+        }
+      })
+      .catch(console.error)
   }
 }
 </script>
